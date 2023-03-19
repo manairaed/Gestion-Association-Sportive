@@ -1,0 +1,391 @@
+<app-sid-bar></app-sid-bar>
+<nz-modal class="large" [(nzVisible)]="isVisibleupdate"  >
+  <form action="" method="post" [formGroup]="eventForm" (ngSubmit)="AddNewEvent()" >
+
+    <h6>Nom:</h6>   
+       <input nz-input placeholder="Nom Event"  nzSize="small" formControlName="eventName" minlength="4" maxlength="18" />
+       <div style="display: inline; font-size: 12px;"  *ngIf="(eventForm.controls['eventName'].dirty || eventForm.controls['eventName'].touched) " class="text-danger">
+       <ng-container *ngIf="eventForm.controls['eventName'].errors?.['required'] ; then TemplateEventRequired "></ng-container>
+           <ng-template #TemplateEventRequired>
+             Event name is required .
+           </ng-template>
+
+           </div>
+           <h6> End  Event:</h6>
+            <input
+            class="form-control"
+            type="text"
+            mwlFlatpickr
+            formControlName="eventend"
+            (ngModelChange)="refresh.next()"
+            [altInput]="true"
+            [convertModelValue]="true"
+             
+            [enableTime]="true"
+            dateFormat="Y-m-dTH:i"
+            altFormat="F j, Y H:i"
+            placeholder="Not set"
+          />
+          <div style="display: inline; font-size: 12px;"  *ngIf="(eventForm.controls['eventend'].dirty || eventForm.controls['eventend'].touched) " class="text-danger">
+           <ng-container *ngIf="eventForm.controls['eventend'].errors?.['required'] ; then TemplateEventendRequired;   "></ng-container>
+               <ng-template #TemplateEventendRequired>
+                 Event date is required .
+               </ng-template>
+
+               </div>
+               <h6> Description:</h6>
+               <input nz-input placeholder="describtiont"  nzSize="small" formControlName="describtion"  />
+               <div style="display: inline; font-size: 12px;"  *ngIf="(eventForm.controls['describtion'].dirty || eventForm.controls['describtion'].touched) " class="text-danger">
+               <ng-container *ngIf="eventForm.controls['describtion'].errors?.['required'] ; then TemplateEventRequired "></ng-container>
+                   <ng-template #TemplateEventRequired>
+                     Description   is required .
+                   </ng-template>
+                 </div>
+           <div class="modal-footer">
+             <button  type="submit" class="btn btn-outline-secondary" [disabled]="this.eventForm.invalid "     >
+               OK
+             </button>
+           </div>
+         </form>
+</nz-modal>
+<div class="Marge">
+
+    <div class="calendar">
+    <nz-content>
+      <div class="inner-content">
+        <div class="row text-center">
+          <div class="col-md-4">
+            <div class="btn-group">
+              <div
+                class="btn btn-primary"
+                mwlCalendarPreviousView
+                [view]="view"
+                [(viewDate)]="viewDate"
+                (viewDateChange)="closeOpenMonthViewDay()"
+              >
+                Previous
+              </div>
+              <div
+                class="btn btn-outline-secondary"
+                mwlCalendarToday
+                [(viewDate)]="viewDate"
+              >
+                Today
+              </div>
+              <div
+                class="btn btn-primary"
+                mwlCalendarNextView
+                [view]="view"
+                [(viewDate)]="viewDate"
+                (viewDateChange)="closeOpenMonthViewDay()"
+              >
+                Next
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
+          </div>
+          <div class="col-md-4">
+            <div class="btn-group">
+              <div
+                class="btn btn-primary"
+                (click)="setView(CalendarView.Month)"
+                [class.active]="view === CalendarView.Month"
+              >
+                Month
+              </div>
+              <div
+                class="btn btn-primary"
+                (click)="setView(CalendarView.Week)"
+                [class.active]="view === CalendarView.Week"
+              >
+                Week
+              </div>
+              <div
+                class="btn btn-primary"
+                (click)="setView(CalendarView.Day)"
+                [class.active]="view === CalendarView.Day"
+              >
+                Day
+              </div>
+            </div>
+          </div>
+        </div>
+        <br />
+        <div [ngSwitch]="view">
+          <mwl-calendar-month-view
+          
+            *ngSwitchCase="CalendarView.Month"
+            [viewDate]="viewDate"
+            [events]="events"
+            [refresh]="refresh"
+            [activeDayIsOpen]="activeDayIsOpen"
+             (dayClicked)="dayClicked($event.day)"
+           
+
+            (eventTimesChanged)="eventTimesChanged($event)"
+          >
+          </mwl-calendar-month-view>
+          <mwl-calendar-week-view
+            *ngSwitchCase="CalendarView.Week"
+            [viewDate]="viewDate"
+            [events]="events"
+            [refresh]="refresh"
+           
+            (eventTimesChanged)="eventTimesChanged($event)"
+          >
+          </mwl-calendar-week-view>
+          <mwl-calendar-day-view
+            *ngSwitchCase="CalendarView.Day"
+            [viewDate]="viewDate"
+            [events]="events"
+            [refresh]="refresh"
+       
+            (eventTimesChanged)="eventTimesChanged($event)"
+          >
+          </mwl-calendar-day-view>
+        </div>
+        
+        <!-- Everything you see below is just for the demo, you don't need to include it in your app -->
+        
+        <br /><br /><br />
+        
+        <h3>
+          Edit delivery date
+         
+           
+        
+          <div class="clearfix"></div>
+        </h3>
+        
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Title</th>
+
+                <th>Starts at</th>
+                <th>Ends at</th>
+                <th>Remove</th>
+                <th>Update</th>
+
+              </tr>
+            </thead>
+        
+            <tbody>
+              <tr *ngFor="let event of events">
+                <td>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="event.title"
+                    disabled
+                    (keyup)="refresh.next()"
+                  />
+                </td>
+ 
+                
+                <td>
+                  <input
+                    class="form-control"
+                    type="text"
+                    mwlFlatpickr
+                    [(ngModel)]="event.start"
+                    (ngModelChange)="refresh.next()"
+                    [altInput]="true"
+                    disabled
+                    [convertModelValue]="true"
+                    [enableTime]="true"
+                    dateFormat="Y-m-dTH:i"
+                    altFormat="F j, Y H:i"
+                    placeholder="Not set"
+                  />
+                </td>
+                <td>
+                  <input
+                    class="form-control"
+                    type="text"
+                    mwlFlatpickr
+                    [(ngModel)]="event.end"
+                    (ngModelChange)="refresh.next()"
+                    [altInput]="true"
+                    [convertModelValue]="true"
+                    disabled
+                    [enableTime]="true"
+                    dateFormat="Y-m-dTH:i"
+                    altFormat="F j, Y H:i"
+                    placeholder="Not set"
+                  />
+                </td>
+                <td>
+                  <button class="btn btn-danger"  [disabled]="Permission"  (click)="deleteEvent(event)">
+                    Delete
+                  </button> </td>
+              <td>  
+                 <button class="btn btn-primary" (click)="showModalupdate(event)" >
+                Update
+              </button>
+            </td>
+               
+               
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <ng-template #modalContent let-close="close">
+          <div class="modal-header">
+            <h5 class="modal-title">New Event</h5>
+            <button type="button" class="close" (click)="close()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div>
+              <form action="" method="post" [formGroup]="eventForm" (ngSubmit)="AddNewEvent()" >
+  
+           <h6>Nom:</h6>   
+              <input nz-input placeholder="Nom Event"  nzSize="small" formControlName="eventName" minlength="4" maxlength="18" />
+              <div style="display: inline; font-size: 12px;"  *ngIf="(eventForm.controls['eventName'].dirty || eventForm.controls['eventName'].touched) " class="text-danger">
+              <ng-container *ngIf="eventForm.controls['eventName'].errors?.['required'] ; then TemplateEventRequired "></ng-container>
+                  <ng-template #TemplateEventRequired>
+                    Event name is required .
+                  </ng-template>
+ 
+                  </div>
+                  <h6> End  Event:</h6>
+                   <input
+                   class="form-control"
+                   type="text"
+                   mwlFlatpickr
+                   formControlName="eventend"
+                   (ngModelChange)="refresh.next()"
+                   [altInput]="true"
+                   [convertModelValue]="true"
+                    
+                   [enableTime]="true"
+                   dateFormat="Y-m-dTH:i"
+                   altFormat="F j, Y H:i"
+                   placeholder="Not set"
+                 />
+                 <div style="display: inline; font-size: 12px;"  *ngIf="(eventForm.controls['eventend'].dirty || eventForm.controls['eventend'].touched) " class="text-danger">
+                  <ng-container *ngIf="eventForm.controls['eventend'].errors?.['required'] ; then TemplateEventendRequired;   "></ng-container>
+                      <ng-template #TemplateEventendRequired>
+                        Event date is required .
+                      </ng-template>
+     
+                      </div>
+                      <h6> Description:</h6>
+                      <input nz-input placeholder="describtiont"  nzSize="small" formControlName="describtion"  />
+                      <div style="display: inline; font-size: 12px;"  *ngIf="(eventForm.controls['describtion'].dirty || eventForm.controls['describtion'].touched) " class="text-danger">
+                      <ng-container *ngIf="eventForm.controls['describtion'].errors?.['required'] ; then TemplateEventRequired "></ng-container>
+                          <ng-template #TemplateEventRequired>
+                            Description   is required .
+                          </ng-template>
+         
+                        </div>
+                  <div class="modal-footer">
+                    <button  type="submit" class="btn btn-outline-secondary" [disabled]="this.eventForm.invalid "     >
+                      OK
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" (click)="close()">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+                </div>
+              </div>
+   
+        </ng-template>
+        <ng-template #modalContent2 let-close="close">
+          <div class="modal-header">
+           
+            <h5 class="modal-title">Update Event</h5>
+            <button type="button" class="close" (click)="close()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div>
+              <form action="" method="post" [formGroup]="eventFormupdate" (ngSubmit)="UpdateEvent()" >
+  
+           <h6>Nom:</h6>   
+              <input nz-input placeholder="Nom Event"  nzSize="small" formControlName="titreupdate" minlength="4" maxlength="8" />
+              <div style="display: inline; font-size: 12px;"  *ngIf="(eventFormupdate.controls['titreupdate'].dirty || eventFormupdate.controls['titreupdate'].touched) " class="text-danger">
+              <ng-container *ngIf="eventFormupdate.controls['titreupdate'].errors?.['required'] ; then TemplateEventRequired "></ng-container>
+                  <ng-template #TemplateEventRequired>
+                    Event name is required .
+                  </ng-template>
+ 
+                  </div>
+                  <h6> Debut  Event:</h6>
+                  <input
+                  class="form-control"
+                  type="text"
+                  mwlFlatpickr
+                  formControlName="eventdebutupdate"
+                  (ngModelChange)="refresh.next()"
+                  [altInput]="true"
+                  [convertModelValue]="true"
+                   
+                  [enableTime]="true"
+                  dateFormat="Y-m-dTH:i"
+                  altFormat="F j, Y H:i"
+                  placeholder="Not set"
+                />
+                <div style="display: inline; font-size: 12px;"  *ngIf="(eventFormupdate.controls['eventdebutupdate'].dirty || eventFormupdate.controls['eventdebutupdate'].touched) " class="text-danger">
+                 <ng-container *ngIf="eventFormupdate.controls['eventdebutupdate'].errors?.['required'] ; then TemplateEventebutRequired;   "></ng-container>
+                     <ng-template #TemplateEventebutRequired>
+                       Event date is required .
+                     </ng-template>
+    
+                     </div>
+                  <h6> End  Event:</h6>
+                   <input
+                   class="form-control"
+                   type="text"
+                   mwlFlatpickr
+                   formControlName="eventendupdate"
+                   (ngModelChange)="refresh.next()"
+                   [altInput]="true"
+                   [convertModelValue]="true"
+                    
+                   [enableTime]="true"
+                   dateFormat="Y-m-dTH:i"
+                   altFormat="F j, Y H:i"
+                   placeholder="Not set"
+                 />
+                 <div style="display: inline; font-size: 12px;"  *ngIf="(eventFormupdate.controls['eventendupdate'].dirty || eventFormupdate.controls['eventendupdate'].touched) " class="text-danger">
+                  <ng-container *ngIf="eventFormupdate.controls['eventendupdate'].errors?.['required'] ; then TemplateEventendRequired;   "></ng-container>
+                      <ng-template #TemplateEventendRequired>
+                        Event date is required .
+                      </ng-template>
+     
+                      </div>
+ 
+                  <div class="modal-footer">
+                    <button  type="submit" class="btn btn-outline-secondary"       >
+                      OK
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" (click)="close()">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+                </div>
+              </div>
+   
+        </ng-template>
+    
+  
+      </div>
+    </nz-content>
+  </div>
+ </div>
+
+
+
+
+
+
