@@ -21,3 +21,4 @@ Gestion d'une association sportive est une application web et mobile développé
  4. Exécutez l'application backend en exécutant mvn spring-boot:run dans le dossier racine du projet backend
  5. Exécutez l'application frontend en exécutant ng serve dans le dossier racine du projet frontend.
  ## Contributeurs
+[MohamedOuechteti] (https://github.com/mohamed7514)
